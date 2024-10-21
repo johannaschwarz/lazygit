@@ -1,6 +1,7 @@
 package presentation
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/gookit/color"
@@ -163,6 +164,10 @@ func getFileLine(
 
 	if isSubmodule {
 		output += theme.DefaultTextColor.Sprint(" (submodule)")
+	} else {
+		if lineChanges := formatLineChanges(file); lineChanges != "" {
+			output += " " + lineChanges
+		}
 	}
 
 	return output
@@ -184,6 +189,26 @@ func formatFileStatus(file *models.File, restColor style.TextStyle) string {
 	}
 
 	return firstCharCl.Sprint(firstChar) + secondCharCl.Sprint(secondChar)
+}
+
+func formatLineChanges(file *models.File) string {
+	if file == nil {
+		return ""
+	}
+	output := ""
+
+	if file.LinesAdded != 0 {
+		output += style.FgGreen.Sprint("+" + strconv.Itoa(file.LinesAdded))
+	}
+
+	if file.LinesDeleted != 0 {
+		if output != "" {
+			output += " "
+		}
+		output += style.FgRed.Sprint("−" + strconv.Itoa(file.LinesDeleted))
+	}
+
+	return output
 }
 
 func getCommitFileLine(
