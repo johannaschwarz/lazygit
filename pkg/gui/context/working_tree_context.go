@@ -30,7 +30,8 @@ func NewWorkingTreeContext(c *ContextCommon) *WorkingTreeContext {
 
 	getDisplayStrings := func(_ int, _ int) [][]string {
 		showFileIcons := icons.IsIconEnabled() && c.UserConfig().Gui.ShowFileIcons
-		lines := presentation.RenderFileTree(viewModel, c.Model().Submodules, showFileIcons)
+		showNumberOfLineChanges := c.UserConfig().Gui.ShowNumberOfLineChanges
+		lines := presentation.RenderFileTree(viewModel, c.Model().Submodules, showFileIcons, showNumberOfLineChanges)
 		return lo.Map(lines, func(line string, _ int) []string {
 			return []string{line}
 		})

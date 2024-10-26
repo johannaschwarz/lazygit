@@ -22,13 +22,14 @@ const (
 func RenderFileTree(
 	tree filetree.IFileTree,
 	submoduleConfigs []*models.SubmoduleConfig,
-	showFileIcons bool,
+	showFileIcons,
+	showNumberOfLineChanges bool,
 ) []string {
 	collapsedPaths := tree.CollapsedPaths()
 	return renderAux(tree.GetRoot().Raw(), collapsedPaths, -1, -1, func(node *filetree.Node[models.File], treeDepth int, visualDepth int, isCollapsed bool) string {
 		fileNode := filetree.NewFileNode(node)
 
-		return getFileLine(isCollapsed, fileNode.GetHasUnstagedChanges(), fileNode.GetHasStagedChanges(), treeDepth, visualDepth, showFileIcons, submoduleConfigs, node)
+		return getFileLine(isCollapsed, fileNode.GetHasUnstagedChanges(), fileNode.GetHasStagedChanges(), treeDepth, visualDepth, showNumberOfLineChanges, showFileIcons, submoduleConfigs, node)
 	})
 }
 
@@ -112,6 +113,7 @@ func getFileLine(
 	hasStagedChanges bool,
 	treeDepth int,
 	visualDepth int,
+	showNumberOfLineChanges,
 	showFileIcons bool,
 	submoduleConfigs []*models.SubmoduleConfig,
 	node *filetree.Node[models.File],
@@ -164,10 +166,10 @@ func getFileLine(
 
 	if isSubmodule {
 		output += theme.DefaultTextColor.Sprint(" (submodule)")
-	} else {
-		if lineChanges := formatLineChanges(file); lineChanges != "" {
-			output += " " + lineChanges
-		}
+	}
+
+	if lineChanges := formatLineChanges(file); showNumberOfLineChanges && lineChanges != "" {
+		output += " " + lineChanges
 	}
 
 	return output
