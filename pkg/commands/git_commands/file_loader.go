@@ -12,6 +12,7 @@ import (
 
 type FileLoaderConfig interface {
 	GetShowUntrackedFiles() string
+	GetShowNumberOfLineChanges() bool
 }
 
 type FileLoader struct {
@@ -31,7 +32,8 @@ func NewFileLoader(gitCommon *GitCommon, cmd oscommands.ICmdObjBuilder, config F
 }
 
 type GetStatusFileOptions struct {
-	NoRenames bool
+	NoRenames    bool
+	GetFileDiffs bool
 }
 
 func (self *FileLoader) GetStatusFiles(opts GetStatusFileOptions) []*models.File {
@@ -49,9 +51,12 @@ func (self *FileLoader) GetStatusFiles(opts GetStatusFileOptions) []*models.File
 	}
 	files := []*models.File{}
 
-	fileDiffs, err := self.getFileDiffs()
-	if err != nil {
-		self.Log.Error(err)
+	fileDiffs := map[string]FileDiff{}
+	if self.config.GetShowNumberOfLineChanges() {
+		fileDiffs, err = self.getFileDiffs()
+		if err != nil {
+			self.Log.Error(err)
+		}
 	}
 
 	for _, status := range statuses {

@@ -207,7 +207,7 @@ func formatLineChanges(file *models.File) string {
 		if output != "" {
 			output += " "
 		}
-		output += style.FgRed.Sprint("−" + strconv.Itoa(file.LinesDeleted))
+		output += style.FgRed.Sprint("-" + strconv.Itoa(file.LinesDeleted))
 	}
 
 	return output
